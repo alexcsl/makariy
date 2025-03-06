@@ -210,7 +210,7 @@ const ProgramGrid = () => {
     </section>
   );
 };
-const ProgramSection = ProgramGrid; // Rename to match usage
+const ProgramSection = ProgramGrid;
 const StatsSection = () => {
   const { isDarkMode } = useContext(DarkModeContext);
   

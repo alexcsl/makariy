@@ -16,6 +16,7 @@ import {
 import { Menu } from '@headlessui/react';
 import { useFormik } from 'formik';
 
+
 // Firebase Configuration
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -30,7 +31,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 // Dark Mode Context
-const DarkModeContext = createContext();
+const DarkModeContext = createContext();  
 
 // ================== Components ==================
 const navLinkStyle = (isDarkMode, isActive) => 
@@ -544,16 +545,16 @@ const RegistrationPage = () => {
             <div className="space-y-4">
               <div>
                 <h3 className="font-semibold">Let's talk!</h3>
-                <p>+234 09012346514</p>
-                <p>hello@makangratis.com</p>
+                <p>+62 812 3456 7890</p>
+                <p>kontak@makariy.org</p>
               </div>
               <div>
                 <h3 className="font-semibold">Headoffice</h3>
-                <p>8 Brewery Drive, Lagos, Nigeria</p>
+                <p>Jl. Sudirman No. 123, Jakarta Selatan</p>
               </div>
               <div>
                 <h3 className="font-semibold">Branch Office</h3>
-                <p>Opp Opolo round about, Yenagoa, Bayelsa, Nigeria</p>
+                <p>Jl. Gatot Subroto No. 456, Bandung</p>
               </div>
             </div>
 
@@ -610,7 +611,7 @@ const RegistrationPage = () => {
                       name="schoolName"
                       type="text"
                       className={`w-full p-4 border rounded-lg ${
-                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white'
+                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white text-black'
                       }`}
                     />
                   </motion.div>
@@ -627,7 +628,7 @@ const RegistrationPage = () => {
                       name="address"
                       as="textarea"
                       className={`w-full p-4 border rounded-lg ${
-                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white'
+                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white text-black'
                       }`}
                     />
                   </motion.div>
@@ -645,7 +646,7 @@ const RegistrationPage = () => {
                         name="contactEmail"
                         type="email"
                         className={`w-full p-4 border rounded-lg ${
-                          isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white'
+                          isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white text-black'
                         }`}
                       />
                     </motion.div>
@@ -662,7 +663,7 @@ const RegistrationPage = () => {
                         name="phoneNumber"
                         type="tel"
                         className={`w-full p-4 border rounded-lg ${
-                          isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white'
+                          isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white text-black'
                         }`}
                       />
                     </motion.div>
@@ -680,7 +681,7 @@ const RegistrationPage = () => {
                       name="studentCount"
                       type="number"
                       className={`w-full p-4 border rounded-lg ${
-                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white'
+                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white text-black'
                       }`}
                     />
                   </motion.div>
@@ -697,7 +698,7 @@ const RegistrationPage = () => {
                       name="message"
                       as="textarea"
                       className={`w-full p-4 border rounded-lg ${
-                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white'
+                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white text-black'
                       }`}
                     />
                   </motion.div>
@@ -1399,7 +1400,7 @@ const ProfileDropdown = () => {
           {user?.email?.[0]?.toUpperCase() || 'U'}
         </div>
       </Menu.Button>
-      <Menu.Items className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+      <Menu.Items className="absolute right-0 mt-2 w-48 z-50 bg-white rounded-md shadow-lg py-1">
         <Menu.Item>
           {({ active }) => (
             <button

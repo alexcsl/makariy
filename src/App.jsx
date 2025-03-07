@@ -11,7 +11,9 @@ import {
   AcademicCapIcon,
   GlobeAltIcon,
   MoonIcon,
-  PlayIcon
+  PlayIcon,
+  UserGroupIcon,
+  CalendarIcon
 } from '@heroicons/react/24/outline';
 import { Menu } from '@headlessui/react';
 import { useFormik } from 'formik';
@@ -739,13 +741,140 @@ const RegistrationPage = () => {
 
 const ProjectsPage = () => {
   const { isDarkMode } = useContext(DarkModeContext);
+  
+  const projects = [
+    {
+      title: "Program Sekolah Dasar",
+      location: "Jakarta Pusat",
+      meals: 12500,
+      schools: 8,
+      image: "/project-school.jpg",
+      description: "Program makan siang untuk siswa SD kurang mampu di wilayah Jakarta Pusat"
+    },
+    {
+      title: "Daerah Terpencil",
+      location: "Papua Barat",
+      meals: 8400,
+      schools: 5,
+      image: "/project-rural.jpg",
+      description: "Distribusi makanan bergizi ke sekolah-sekolah terpencil"
+    },
+    {
+      title: "Pasca Bencana",
+      location: "Palu, Sulawesi",
+      meals: 15600,
+      schools: 12,
+      image: "/project-disaster.jpg",
+      description: "Bantuan makanan darurat untuk anak-anak korban bencana alam"
+    }
+  ];
+
+  const stats = [
+    { id: 1, name: 'Total Makanan Disalurkan', value: '34M+', icon: HeartIcon },
+    { id: 2, name: 'Sekolah Terdaftar', value: '400+', icon: UserGroupIcon },
+    { id: 3, name: 'Provinsi Terjangkau', value: '20+', icon: GlobeAltIcon },
+    { id: 4, name: 'Tahun Beroperasi', value: '5+', icon: CalendarIcon }
+  ];
 
   return (
-    <div className={`container mx-auto px-4 py-12 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
-      <h2 className={`text-3xl font-bold mb-8 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-        Projects Page
-      </h2>
-      {/* Add project details here */}
+    <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      {/* Hero Section */}
+      <motion.section 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className={`relative py-24 ${isDarkMode ? 'bg-gradient-to-r from-gray-800 to-gray-900' : 'bg-gradient-to-r from-blue-50 to-indigo-50'}`}
+      >
+        <div className="container mx-auto px-4 text-center">
+          <motion.h1 
+            initial={{ y: 20 }}
+            animate={{ y: 0 }}
+            className={`text-4xl md:text-6xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+          >
+            Program Makan Siang Gratis
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className={`text-xl md:text-2xl max-w-3xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}
+          >
+            Membantu menyediakan makanan bergizi untuk anak-anak Indonesia sejak 2018
+          </motion.p>
+        </div>
+      </motion.section>
+
+      {/* Stats Grid */}
+      <div className="container mx-auto px-4 py-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {stats.map((stat) => (
+            <motion.div
+              key={stat.id}
+              whileHover={{ y: -5 }}
+              className={`p-6 rounded-xl ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}
+            >
+              <stat.icon className={`h-12 w-12 mb-4 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+              <h3 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                {stat.value}
+              </h3>
+              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{stat.name}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Projects Grid */}
+      <div className="container mx-auto px-4 py-16">
+        <h2 className={`text-3xl font-bold mb-12 text-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+          Proyek Terkini
+        </h2>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {projects.map((project, index) => (
+            <motion.div
+              key={project.title}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ scale: 1.05 }}
+              className={`overflow-hidden rounded-2xl shadow-xl ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
+            >
+              <div className="h-48 bg-gray-200 overflow-hidden">
+                <img 
+                  src={project.image} 
+                  alt={project.title}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform"
+                />
+              </div>
+              
+              <div className="p-6">
+                <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {project.title}
+                </h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <GlobeAltIcon className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+                  <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{project.location}</p>
+                </div>
+                <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{project.description}</p>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-blue-50'}`}>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-blue-600'}`}>Makanan</p>
+                    <p className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {project.meals.toLocaleString()}+
+                    </p>
+                  </div>
+                  <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-blue-50'}`}>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-blue-600'}`}>Sekolah</p>
+                    <p className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {project.schools}+
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, NavLink } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
@@ -17,6 +17,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Menu } from '@headlessui/react';
 import { useFormik } from 'formik';
+import { HfInference } from '@huggingface/inference';
 
 
 // Firebase Configuration
@@ -881,6 +882,23 @@ const ProjectsPage = () => {
 
 const AboutPage = () => {
   const { isDarkMode } = useContext(DarkModeContext);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef(null);
+
+  const handleVideoClick = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleVideoEnd = () => {
+    setIsPlaying(false);
+  };
 
   return (
     <div className={`${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
@@ -893,7 +911,7 @@ const AboutPage = () => {
       >
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <motion.h2 
+          <motion.h2 
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -919,20 +937,52 @@ const AboutPage = () => {
 
             <motion.div 
               whileHover={{ scale: 1.02 }}
-              className={`aspect-video bg-gray-200 rounded-xl ${isDarkMode ? 'bg-gray-700' : ''}`}
+              className={`relative aspect-video rounded-xl overflow-hidden ${
+                isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+              }`}
+              onClick={handleVideoClick}
             >
-              <div className="w-full h-full flex items-center justify-center">
-                <motion.button 
-                  whileHover={{ scale: 1.1 }}
-                  className="bg-white p-8 rounded-full shadow-lg"
+              <video
+                ref={videoRef}
+                onEnded={handleVideoEnd}
+                className="w-full h-full object-cover"
+                poster="/thumbnail.jpg"
+              >
+                <source
+                  src="/video.mp4"
+                  type="video/mp4"
+                />
+                Your browser does not support the video tag.
+              </video>
+
+              {/* Animated Play/Pause Overlay */}
+              {!isPlaying && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute inset-0 bg-black/30 flex items-center justify-center"
                 >
-                  <PlayIcon className="w-12 h-12 text-blue-600" />
-                </motion.button>
-              </div>
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    className="bg-white/90 p-4 rounded-full shadow-lg backdrop-blur-sm"
+                  >
+                    <PlayIcon className="w-12 h-12 text-blue-600" />
+                  </motion.div>
+                </motion.div>
+              )}
+
+              {/* Progress Bar Animation */}
+              <motion.div
+                className="absolute bottom-0 left-0 h-1 bg-blue-500"
+                animate={{ width: isPlaying ? '100%' : '0%' }}
+                transition={{ duration: videoRef.current?.duration || 0 }}
+              />
             </motion.div>
           </div>
         </div>
       </motion.section>
+    
+  
 
       {/* Misi & Visi Section */}
       <motion.section 
@@ -1550,18 +1600,51 @@ const ChatInterface = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const hf = new HfInference(import.meta.env.VITE_HF_API_TOKEN);
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      setMessages([...messages, { text: newMessage, isBot: false }]);
-      setTimeout(() => {
-        setMessages(msgs => [...msgs, { 
-          text: "Terima kasih pesannya. Tim kami akan segera merespon melalui email." 
-        }]);
-      }, 1000);
-      setNewMessage('');
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || isLoading) return;
+
+    setMessages(prev => [...prev, { text: newMessage, isBot: false }]);
+    setNewMessage('');
+    setIsLoading(true);
+
+    try {
+      const response = await hf.textGeneration({
+        model: "facebook/blenderbot-400M-distill",
+        inputs: `User: ${newMessage}\nBot:`,
+        parameters: {
+          max_new_tokens: 100,
+          temperature: 0.9,
+          repetition_penalty: 1.2
+        },
+        options: {
+          use_cache: true,
+          wait_for_model: true
+        }
+      });
+
+      const botReply = response.generated_text 
+        ? response.generated_text.replace('Bot:', '').trim()
+        : "Maaf, saya tidak mengerti pertanyaan itu";
+        
+      setMessages(prev => [...prev, { text: botReply, isBot: true }]);
+      
+    } catch (error) {
+      console.error('Chat Error:', error);
+      setMessages(prev => [...prev, { 
+        text: "Silakan coba lagi dalam beberapa detik", 
+        isBot: true 
+      }]);
     }
+    setIsLoading(false);
   };
+
+  useEffect(() => {
+    const chatWindow = document.getElementById('chat-messages');
+    if (chatWindow) chatWindow.scrollTop = chatWindow.scrollHeight;
+  }, [messages, isLoading]);
 
   return (
     <div className="fixed bottom-8 right-8 z-50">
@@ -1585,26 +1668,50 @@ const ChatInterface = () => {
                 Layanan Pelanggan
               </h3>
             </div>
-            <div className="h-64 p-4 overflow-y-auto">
+            
+            <div id="chat-messages" className="h-64 p-4 overflow-y-auto">
               {messages.map((msg, i) => (
                 <div key={i} className={`mb-4 ${msg.isBot ? 'text-left' : 'text-right'}`}>
-                  <div className={`inline-block p-2 rounded-lg ${
-                    msg.isBot ? 'bg-gray-200 text-gray-900' : 'bg-blue-600 text-white'
+                  <div className={`inline-block p-2 rounded-lg max-w-[80%] ${
+                    msg.isBot 
+                      ? (isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900')
+                      : 'bg-blue-600 text-white'
                   }`}>
                     {msg.text}
                   </div>
                 </div>
               ))}
+              
+              {isLoading && (
+                <div className="text-left">
+                  <div className="inline-block p-2 rounded-lg bg-gray-100">
+                    <div className="flex space-x-2">
+                      <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-100"></div>
+                      <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-200"></div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="p-4">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                className="w-full p-2 border rounded"
-                placeholder="Ketik pesan..."
-              />
+
+            <div className="p-4 border-t">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  className="flex-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Ketik pesan..."
+                />
+                <button
+                  onClick={handleSendMessage}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Kirim
+                </button>
+              </div>
             </div>
           </motion.div>
         )}

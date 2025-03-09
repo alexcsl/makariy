@@ -10,6 +10,7 @@ Makariy adalah platform digital yang bertujuan menyediakan akses makanan bergizi
 - 📊 **Dashboard Statistik Real-time** - Pantau perkembangan program
 - 📱 **Responsive Design** - Akses optimal di semua perangkat
 - ✨ **Animasi Modern** - Transisi halus dengan Framer Motion
+- 🤖 **AI Chatbot** - Menggunakan conversational A.I bot
 
 ## 🛠 Teknologi yang Digunakan
 
